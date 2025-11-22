@@ -1,23 +1,38 @@
 import { LotteryCard } from "@/components/LotteryCard";
-import { getLotteryResults } from "@/data/lotteryData";
 import { useEffect, useState } from "react";
 import { LotteryResult } from "@/types/lottery";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [lotteries, setLotteries] = useState<LotteryResult[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const { toast } = useToast();
 
-  const loadResults = () => {
+  const loadResults = async () => {
     setIsRefreshing(true);
-    // Simular carga de API
-    setTimeout(() => {
-      setLotteries(getLotteryResults());
-      setLastUpdate(new Date());
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-lottery-results');
+      
+      if (error) throw error;
+      
+      if (data?.results) {
+        setLotteries(data.results);
+        setLastUpdate(new Date());
+      }
+    } catch (error) {
+      console.error('Error loading results:', error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los resultados. Intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
       setIsRefreshing(false);
-    }, 500);
+    }
   };
 
   useEffect(() => {
