@@ -1,0 +1,150 @@
+// @deno-types="https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts"
+import { DOMParser, Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface LotteryMapping {
+  id: string;
+  name: string;
+  color: string;
+  logo: string;
+  time?: string;
+}
+
+const lotteryMappings: LotteryMapping[] = [
+  { id: "la-primera-dia", name: "La Primera Día", color: "rojo", logo: "/logos/la-primera-dia.png", time: "12:00 PM" },
+  { id: "anguila-manana", name: "Anguila Mañana", color: "zapote", logo: "/logos/anguila.png", time: "10:00 AM" },
+  { id: "la-suerte-1230", name: "La Suerte", color: "naranja", logo: "/logos/la-suerte.png", time: "12:30 PM" },
+  { id: "anguila-medio-dia", name: "Anguila Medio Día", color: "zapote", logo: "/logos/anguila.png", time: "01:00 PM" },
+  { id: "real-quiniela", name: "Quiniela Real", color: "azul-oscuro", logo: "/logos/loteria-real.png", time: "12:55 PM" },
+  { id: "real-tu-fecha", name: "Tu Fecha Real", color: "azul-oscuro", logo: "/logos/loteria-real.png", time: "12:55 PM" },
+  { id: "real-pega-4", name: "Pega 4 Real", color: "azul-oscuro", logo: "/logos/loteria-real.png", time: "12:55 PM" },
+  { id: "real-loto-pool", name: "Loto Pool Real", color: "azul-oscuro", logo: "/logos/loto-pool-real.png", time: "12:55 PM" },
+  { id: "florida-dia", name: "Florida Día", color: "lila", logo: "/logos/florida-dia.png", time: "01:30 PM" },
+  { id: "lotedom-quiniela", name: "Quiniela LoteDom", color: "celeste", logo: "/logos/lotedom.png", time: "12:00 PM" },
+  { id: "new-york-tarde", name: "New York Tarde", color: "lila", logo: "/logos/new-york-dia.png", time: "03:00 PM" },
+  { id: "gana-mas", name: "Gana Más", color: "verde", logo: "/logos/gana-mas.png", time: "02:30 PM" },
+  { id: "nacional-tarde", name: "Lotería Nacional", color: "verde", logo: "/logos/loteria-nacional.png", time: "02:30 PM" },
+  { id: "juega-pega", name: "Juega+ Pega+", color: "verde", logo: "/logos/gana-mas.png", time: "02:30 PM" },
+  { id: "la-suerte-tarde", name: "La Suerte Dominicana", color: "naranja", logo: "/logos/la-suerte.png", time: "06:00 PM" },
+  { id: "anguila-tarde", name: "Anguila Tarde", color: "zapote", logo: "/logos/anguila.png", time: "06:00 PM" },
+  { id: "loteka-quiniela", name: "Quiniela Loteka", color: "azul-claro", logo: "/logos/loteka.png", time: "07:55 PM" },
+  { id: "loteka-megalotto", name: "MegaLotto", color: "azul-claro", logo: "/logos/loteka.png", time: "07:55 PM" },
+  { id: "mega-chances", name: "Mega Chances", color: "azul-claro", logo: "/logos/mega-chances.png", time: "07:55 PM" },
+  { id: "mc-repartidera", name: "MC Repartidera", color: "azul-claro", logo: "/logos/mega-chances.png", time: "07:55 PM" },
+  { id: "el-extra", name: "El Extra", color: "azul-claro", logo: "/logos/loteka.png", time: "07:55 PM" },
+  { id: "toca-3", name: "Toca 3", color: "azul-claro", logo: "/logos/loteka.png", time: "07:55 PM" },
+  { id: "nacional-noche", name: "Lotería Nacional Noche", color: "verde", logo: "/logos/loteria-nacional.png", time: "09:00 PM" },
+  { id: "anguila-noche", name: "Anguila Noche", color: "zapote", logo: "/logos/anguila.png", time: "09:00 PM" },
+  { id: "leidsa-pega-3", name: "Pega 3 Más", color: "amarillo", logo: "/logos/pega-3-mas.png", time: "08:55 PM" },
+  { id: "quiniela-leidsa", name: "Quiniela Leidsa", color: "amarillo", logo: "/logos/leidsa.png", time: "08:55 PM" },
+  { id: "loto-pool", name: "Loto Pool", color: "amarillo", logo: "/logos/loto-pool.png", time: "08:55 PM" },
+  { id: "super-kino", name: "Super Kino TV", color: "amarillo", logo: "/logos/super-kino.png", time: "08:55 PM" },
+  { id: "la-primera-noche", name: "La Primera Noche", color: "rojo", logo: "/logos/la-primera-noche.png", time: "08:00 PM" },
+  { id: "florida-noche", name: "Florida Noche", color: "lila", logo: "/logos/florida-noche.png", time: "09:30 PM" },
+  { id: "new-york-noche", name: "New York Noche", color: "lila", logo: "/logos/new-york-noche.png", time: "10:30 PM" },
+];
+
+async function fetchLotteryResults() {
+  try {
+    console.log("Fetching lottery results from loteriasdominicanas.com...");
+    const url1 = "https://loteriasdominicanas.com/";
+    const url2 = "https://loteriasdominicanas.com/anguila";
+
+    const [response1, response2] = await Promise.all([
+      fetch(url1),
+      fetch(url2),
+    ]);
+
+    const html1 = await response1.text();
+    const html2 = await response2.text();
+
+    const parser = new DOMParser();
+    const doc1 = parser.parseFromString(html1, "text/html");
+    const doc2 = parser.parseFromString(html2, "text/html");
+
+    if (!doc1 || !doc2) {
+      throw new Error("Failed to parse HTML documents");
+    }
+
+    const results: any[] = [];
+    const gameBlocks1 = doc1.querySelectorAll(".game-block");
+    const gameBlocks2 = doc2.querySelectorAll(".game-block");
+
+    const allBlocks = [...Array.from(gameBlocks1), ...Array.from(gameBlocks2)];
+    console.log(`Found ${allBlocks.length} game blocks`);
+
+    for (const block of allBlocks) {
+      const element = block as Element;
+      const titleElement = element.querySelector(".game-title");
+      const scoreElements = element.querySelectorAll(".score");
+      const dateElement = element.querySelector(".session-date");
+
+      if (!titleElement || !dateElement) continue;
+
+      const title = titleElement.textContent?.trim().toLowerCase() || "";
+      const date = dateElement.textContent?.trim() || "";
+      const numbers = Array.from(scoreElements).map((el) =>
+        (el as Element).textContent?.trim() || ""
+      );
+
+      // Find matching lottery mapping
+      const mapping = lotteryMappings.find((m) =>
+        title.includes(m.name.toLowerCase()) || 
+        m.name.toLowerCase().includes(title)
+      );
+
+      if (mapping && numbers.length > 0) {
+        console.log(`Found result for ${mapping.name}: ${numbers.join('-')}`);
+        results.push({
+          id: mapping.id,
+          name: mapping.name,
+          color: mapping.color,
+          numbers: numbers,
+          date: date,
+          time: mapping.time || "",
+          logo: mapping.logo,
+        });
+      }
+    }
+
+    console.log(`Parsed ${results.length} lottery results`);
+    return results;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Error fetching lottery results:", errorMessage);
+    throw error;
+  }
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    console.log("Processing request for lottery results...");
+    const results = await fetchLotteryResults();
+    
+    return new Response(
+      JSON.stringify({ results }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Error in edge function:", errorMessage);
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    );
+  }
+});
