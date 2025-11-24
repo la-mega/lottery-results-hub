@@ -83,28 +83,37 @@ async function fetchLotteryResults() {
     console.log("Fetching lottery results from loteriasdominicanas.com...");
     const url1 = "https://loteriasdominicanas.com/";
     const url2 = "https://loteriasdominicanas.com/anguila";
+    const url3 = "https://loteriasdominicanas.com/leidsa";
 
-    const [response1, response2] = await Promise.all([
+    const [response1, response2, response3] = await Promise.all([
       fetch(url1),
       fetch(url2),
+      fetch(url3),
     ]);
 
     const html1 = await response1.text();
     const html2 = await response2.text();
+    const html3 = await response3.text();
 
     const parser = new DOMParser();
     const doc1 = parser.parseFromString(html1, "text/html");
     const doc2 = parser.parseFromString(html2, "text/html");
+    const doc3 = parser.parseFromString(html3, "text/html");
 
-    if (!doc1 || !doc2) {
+    if (!doc1 || !doc2 || !doc3) {
       throw new Error("Failed to parse HTML documents");
     }
 
     const results: any[] = [];
     const gameBlocks1 = doc1.querySelectorAll(".game-block");
     const gameBlocks2 = doc2.querySelectorAll(".game-block");
+    const gameBlocks3 = doc3.querySelectorAll(".game-block");
 
-    const allBlocks = [...Array.from(gameBlocks1), ...Array.from(gameBlocks2)];
+    const allBlocks = [
+      ...Array.from(gameBlocks1),
+      ...Array.from(gameBlocks2),
+      ...Array.from(gameBlocks3),
+    ];
     console.log(`Found ${allBlocks.length} game blocks`);
 
     for (const block of allBlocks) {
