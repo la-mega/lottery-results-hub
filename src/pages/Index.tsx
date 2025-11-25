@@ -5,20 +5,21 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
 const Index = () => {
   const [lotteries, setLotteries] = useState<LotteryResult[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(new Date());
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const loadResults = async () => {
     setIsRefreshing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-lottery-results');
-      
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('fetch-lottery-results');
       if (error) throw error;
-      
       if (data?.results) {
         setLotteries(data.results);
         setLastUpdate(new Date());
@@ -28,24 +29,21 @@ const Index = () => {
       toast({
         title: "Error",
         description: "No se pudieron cargar los resultados. Intenta de nuevo.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsRefreshing(false);
     }
   };
-
   useEffect(() => {
     loadResults();
-    
+
     // Auto-refresh cada 5 minutos
     const interval = setInterval(() => {
       loadResults();
     }, 5 * 60 * 1000);
-
     return () => clearInterval(interval);
   }, []);
-
   const groupedLotteries = lotteries.reduce((acc, lottery) => {
     const existing = acc.find(g => g.color === lottery.color);
     if (existing) {
@@ -53,12 +51,14 @@ const Index = () => {
     } else {
       acc.push({
         color: lottery.color,
-        lotteries: [lottery],
+        lotteries: [lottery]
       });
     }
     return acc;
-  }, [] as { color: string; lotteries: LotteryResult[] }[]);
-
+  }, [] as {
+    color: string;
+    lotteries: LotteryResult[];
+  }[]);
   const colorNames: Record<string, string> = {
     verde: "Lotería Nacional · Gana Más · Juega Pega",
     amarillo: "Leidsa",
@@ -69,11 +69,9 @@ const Index = () => {
     naranja: "La Suerte",
     celeste: "Lotedom",
     zapote: "Lotería Águila",
-    zanahoria: "King Lottery",
+    zanahoria: "King Lottery"
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
@@ -84,33 +82,26 @@ const Index = () => {
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <span>
-              Última actualización: {lastUpdate.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })}
+              Última actualización: {lastUpdate.toLocaleTimeString('es-DO', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadResults}
-              disabled={isRefreshing}
-              className="gap-2"
-            >
+            <Button variant="outline" size="sm" onClick={loadResults} disabled={isRefreshing} className="gap-2">
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               Actualizar
             </Button>
           </div>
         </header>
 
-        {groupedLotteries.map((group) => (
-          <div key={group.color} className="mb-12">
+        {groupedLotteries.map(group => <div key={group.color} className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-foreground border-b-2 pb-2">
               {colorNames[group.color]}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {group.lotteries.map((lottery) => (
-                <LotteryCard key={lottery.id} lottery={lottery} />
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-purple-900 text-yellow-400">
+              {group.lotteries.map(lottery => <LotteryCard key={lottery.id} lottery={lottery} />)}
             </div>
-          </div>
-        ))}
+          </div>)}
 
         <footer className="mt-16 pt-8 border-t text-center text-muted-foreground">
           <p className="text-sm">
@@ -119,8 +110,6 @@ const Index = () => {
           </p>
         </footer>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
