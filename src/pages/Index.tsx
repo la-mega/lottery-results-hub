@@ -77,10 +77,10 @@ const Index = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
             Resultados de Loterías
           </h1>
-          <p className="text-muted-foreground text-lg mb-4 text-center">
+          <p className="text-lg mb-4 text-center text-slate-50">
              Jtpro Joel Taveras Te Ofrecemos Los Resultados En Tiempo Real
           </p>
-          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center gap-4 text-sm text-slate-50">
             <span>
               Última actualización: {lastUpdate.toLocaleTimeString('es-DO', {
               hour: '2-digit',
