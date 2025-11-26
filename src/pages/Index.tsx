@@ -78,7 +78,7 @@ const Index = () => {
             Resultados de Loterías
           </h1>
           <p className="text-muted-foreground text-lg mb-4 text-center">
-             JTpro Joel Taveras Te ofrecemos los Resultados en Tiempo Real
+             Jtpro Joel Taveras Te Ofrecemos Los Resultados En Tiempo Real
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <span>
