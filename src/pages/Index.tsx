@@ -98,7 +98,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold mb-6 text-foreground border-b-2 pb-2">
               {colorNames[group.color]}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-purple-900 text-yellow-400">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-yellow-400 bg-slate-950">
               {group.lotteries.map(lottery => <LotteryCard key={lottery.id} lottery={lottery} />)}
             </div>
           </div>)}
