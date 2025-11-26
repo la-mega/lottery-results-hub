@@ -77,8 +77,8 @@ const Index = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
             Resultados de Loterías
           </h1>
-          <p className="text-muted-foreground text-lg mb-4">
-            República Dominicana - Resultados en Tiempo Real
+          <p className="text-muted-foreground text-lg mb-4 text-center">
+             JTpro Joel Taveras Te ofrecemos los Resultados en Tiempo Real
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <span>
